@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-export const getFileByUrl = async (url: string | null): Promise<Buffer | null> => {
+export interface FileByUrl {
+  length: number;
+  data: Buffer;
+  mimetype: string;
+}
+
+export const getFileByUrl = async (url: string | null): Promise<FileByUrl | null> => {
   try {
     if (!url) {
       return null;
@@ -11,9 +17,13 @@ export const getFileByUrl = async (url: string | null): Promise<Buffer | null> =
     });
 
     if (response.status === 200) {
-      const buffer = Buffer.from(response.data, 'binary');
-      console.log('File loaded to buffer');
-      return buffer;
+      // const buffer = Buffer.from(response.data);
+      // console.log('File loaded to buffer');
+      return {
+        length: response.data.length,
+        mimetype: response.headers['content-type'],
+        data: response.data
+      };
     } else {
       console.error('Error when load file to buffer', response.status);
       return Promise.resolve(null);

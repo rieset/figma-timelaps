@@ -1,8 +1,9 @@
 import { Timelapse } from './timelapse';
+import { TimelapseOptions } from './timelapse.model';
 
-export const common = async (cmd): Promise<any> => {
+export const common = async (cmd, options: TimelapseOptions): Promise<any> => {
 
-  const timelapse = new Timelapse();
+  const timelapse = new Timelapse(options);
   await timelapse.init();
 
   switch (cmd) {

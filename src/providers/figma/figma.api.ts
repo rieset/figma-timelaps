@@ -1,63 +1,84 @@
 import axios, { AxiosResponse } from 'axios';
-import { FigmaImageFile, FigmaImagesFileResponse } from './figma.api.model';
-import { getFileByUrl } from '../../utils/files';
+import {
+  FigmaAPIOptions,
+  FigmaImageFile,
+  FigmaImagesFileResponse
+} from './figma.api.model';
+import { FileByUrl, getFileByUrl } from '../../utils/files';
 
 export class FigmaAPI {
   private host = 'https://api.figma.com';
-  private fileAge: number
+  private options: FigmaAPIOptions;
 
   private apiKey: string;
   private fileUUID: string;
 
   private enabled: boolean = false;
 
-  constructor(apiKey, FileUUID, age: number) {
+  constructor(apiKey, FileUUID, options: FigmaAPIOptions) {
     this.apiKey = apiKey;
     this.fileUUID = FileUUID;
-    this.fileAge = age;
+    this.options = options;
 
-    // When file age less than 12 hours (43200 seconds) then enable class methods
-    if (this.fileAge < 43200) {
+    // When file age less than 12 hours (obsolescence parameter) then enable class methods
+    if (this.options.age < this.options.obsolescence) {
+      console.log('Аile is too old');
+      this.enabled = true;
+    }
+
+    if (this.options.age < this.options.frequency) {
       this.enabled = true;
     }
   }
 
-  public async getFileImage (fileUUID: string): Promise<FigmaImageFile | null> {
+  public async getFileImage (): Promise<FigmaImageFile[]> {
     if (!this.enabled) {
-      return null;
+      return [];
     }
 
-    const url = new URL(`/v1/images/${fileUUID}?format=png&ids=0-1`, this.host);
+    const url = new URL(`/v1/images/${this.options.file}?format=png&ids=${this.options.nodes}`, this.host);
 
     return await axios.get(url.toString(), {
       headers: {
         'X-Figma-Token': this.apiKey
       } as any,
       responseType: 'json'
-    }).then(async (response: AxiosResponse<FigmaImagesFileResponse>): Promise<FigmaImageFile | null> => {
+    }).then(async (response: AxiosResponse<FigmaImagesFileResponse>): Promise<FigmaImageFile[]> => {
 
       if (response?.data?.err) {
-        return null;
+        return [];
       }
 
-      if (!response?.data?.images || !response?.data?.images['0:1']) {
-        return null;
+      if (!response?.data?.images || typeof response?.data?.images !== 'object') {
+        return [];
       }
 
-      const file = await getFileByUrl(response?.data?.images['0:1'] || null);
+      const result: FigmaImageFile[] = [];
 
-      if (!file) {
-        return null;
+      for await (const key of Object.keys(response?.data?.images)) {
+        const file: FileByUrl | null = await getFileByUrl(response?.data?.images['0:1'] || null);
+
+        if (!file) {
+          continue;
+        }
+
+        const node = key.replace(':', '-');
+
+        result.push({
+          node,
+          fileUUID: this.options.file,
+          timestamp: new Date().valueOf().toString(),
+          name: [this.options.file, node, new Date().valueOf().toString()].join('/'),
+          mimetype: file.mimetype,
+          data: file.data,
+          length: file.length
+        })
       }
 
-      return {
-        name: new Date().valueOf().toString() + '-' + fileUUID,
-        mimetype: response?.headers['content-type'],
-        data: file
-      }
+      return result;
     }).catch((error) => {
       console.log('Error wheb get file image from Figma API', error);
-      return Promise.resolve(null);
+      return [];
     })
   }
 }

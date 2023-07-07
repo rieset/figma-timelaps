@@ -3,7 +3,12 @@ const core = require('@actions/core');
 
 const cmd = core.getInput('cmd');
 
-common(cmd).then((report) => {
+common(cmd, {
+  obsolescence: 100,
+  frequency: 100,
+  nodes: '0-1',
+  file: ''
+}).then((report) => {
   if (!report) {
     throw new Error('Action complete with error');
   }

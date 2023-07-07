@@ -6,13 +6,14 @@
   "types": "./dist/common.d.ts",
   "module": "./dist/common.js",
   "bin": {
-    "site-heater": "./cli.js"
+    "figma-timelapse": "./cli.js"
   },
   "files": [
     "dist/"
   ],
   "dependencies": {
     "@actions/core": "1.10.0",
+    "aws-sdk": "^2.1413.0",
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "luxon": "^3.3.0",
@@ -33,14 +34,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rieset/s3-strapi-migrator"
+    "url": "git+https://github.com/rieset/figma-timelapse"
   },
   "author": "Albert Iblyaminov (albert@iblyaminov.io)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rieset/site-heater/issues"
+    "url": "https://github.com/rieset/figma-timelapse/issues"
   },
-  "homepage": "https://github.com/rieset/site-heater#readme",
+  "homepage": "https://github.com/rieset/figma-timelapse#readme",
   "keywords": [
     "sites",
     "s3",

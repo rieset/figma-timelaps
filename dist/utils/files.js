@@ -20,9 +20,13 @@ const getFileByUrl = (url) => __awaiter(void 0, void 0, void 0, function* () {
             responseType: 'arraybuffer'
         });
         if (response.status === 200) {
-            const buffer = Buffer.from(response.data, 'binary');
-            console.log('File loaded to buffer');
-            return buffer;
+            // const buffer = Buffer.from(response.data);
+            // console.log('File loaded to buffer');
+            return {
+                length: response.data.length,
+                mimetype: response.headers['content-type'],
+                data: response.data
+            };
         }
         else {
             console.error('Error when load file to buffer', response.status);

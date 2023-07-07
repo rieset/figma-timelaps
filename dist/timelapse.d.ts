@@ -1,7 +1,9 @@
+import { TimelapseOptions } from './timelapse.model';
 export declare class Timelapse {
     private s3;
     private figma;
-    constructor();
+    private options;
+    constructor(options: TimelapseOptions);
     init(): Promise<void>;
-    snapshot(): Promise<any>;
+    snapshot(): Promise<string | null>;
 }

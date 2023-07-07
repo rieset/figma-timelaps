@@ -1,8 +1,9 @@
 import { getDiffTime } from '../../utils/time';
 import { FigmaAPI } from './figma.api';
 import axios from 'axios';
+import { FigmaProviderOptions } from './figma.provider.model';
 
-export const figmaProvider = async (): Promise<any> => {
+export const figmaProvider = async (options: FigmaProviderOptions): Promise<any> => {
 
   const host = 'https://api.figma.com';
 
@@ -28,7 +29,10 @@ export const figmaProvider = async (): Promise<any> => {
 
         console.log(`Connect to Figma File is success. Last modified: ${diff.days} days ${diff.hours} hours ${Math.round(diff.minutes || 0)} minutes ago`);
 
-        return new FigmaAPI(process.env.TIMELAPSE_FIGMA_API_KEY, process.env.TIMELAPSE_FIGMA_FILE_UUID, seconds);
+        return new FigmaAPI(process.env.TIMELAPSE_FIGMA_API_KEY, process.env.TIMELAPSE_FIGMA_FILE_UUID, {
+          age: seconds,
+          ...options
+        });
       })
       .catch(error => {
         console.error(error);

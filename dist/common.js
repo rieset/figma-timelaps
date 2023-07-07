@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.common = void 0;
 const timelapse_1 = require("./timelapse");
-const common = (cmd) => __awaiter(void 0, void 0, void 0, function* () {
-    const timelapse = new timelapse_1.Timelapse();
+const common = (cmd, options) => __awaiter(void 0, void 0, void 0, function* () {
+    const timelapse = new timelapse_1.Timelapse(options);
     yield timelapse.init();
     switch (cmd) {
         case 'snapshot':

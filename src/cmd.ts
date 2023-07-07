@@ -1,7 +1,12 @@
 import { common } from './common';
+const [ command ] = process.argv
 
-const [ node, script, command ] = process.argv
-common(command)
+common(command, {
+  obsolescence: 100,
+  frequency: 100,
+  nodes: '0-1',
+  file: ''
+})
 .then((result: string | null) => {
   if (result) {
     console.log(result);

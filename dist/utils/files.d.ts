@@ -1,2 +1,7 @@
 /// <reference types="node" />
-export declare const getFileByUrl: (url: string | null) => Promise<Buffer | null>;
+export interface FileByUrl {
+    length: number;
+    data: Buffer;
+    mimetype: string;
+}
+export declare const getFileByUrl: (url: string | null) => Promise<FileByUrl | null>;

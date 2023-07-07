@@ -1,4 +1,5 @@
 import { FigmaImageFile } from './providers/figma/figma.api.model';
+import { TimelapseOptions } from './timelapse.model';
 
 require('dotenv').config();
 
@@ -7,29 +8,38 @@ export class Timelapse {
   private s3;
   private figma;
 
-  constructor () {}
+  private options;
+
+  constructor (options: TimelapseOptions) {
+    this.options = options;
+  }
 
   async init() {
     this.s3 = await require(__dirname + '/providers/s3/s3').s3Provider();
-    this.figma = await require(__dirname + '/providers/figma/figma.provider').figmaProvider();
+    this.figma = await require(__dirname + '/providers/figma/figma.provider').figmaProvider(this.options);
   }
 
   async snapshot() {
-    const file: FigmaImageFile | null = await this.figma.getFileImage(process.env.TIMELAPSE_FIGMA_FILE_UUID);
+    const files: FigmaImageFile[] = await this.figma.getFileImage();
 
-    if (!file) {
-      console.error('File is unavailable. File may be older than 12 hours');
+    if (files.length === 0) {
+      console.error('File is unavailable. File may be older than need');
       return null;
     }
 
-    return await this.s3.upload(file)
-      .then((path: any) => {
-        return `Snapshot stored by link: ${[path]}`
-      })
-      .catch((error) => {
-        console.log('Error when upload file to S3', error);
-        return Promise.resolve(null);
-      })
-  }
+    const report: string[] = [];
 
+    for await (const file of files) {
+      await this.s3.upload(file)
+        .then((path: string) => {
+          report.push( `Snapshot stored by link: ${path}`)
+        })
+        .catch((error) => {
+          // console.log(error);
+          report.push( `Error when upload file from node ${file?.node} to S3. ${error?.message}`)
+        })
+    }
+
+    return report.join('\n');
+  }
 }

@@ -2,7 +2,7 @@
 
 Tool to create a timelapse of a Figma board
 
-## Use NPX
+## Create snapshot
 ```
-    npx figma-timelapse [I'll figure it out later].
+    npx figma-timelapse --file=<fileUUID> --frequency=<frequency update> --nodes=<nodes ids>  --obsolescence=<moral obsolescence> snapshot
 ```

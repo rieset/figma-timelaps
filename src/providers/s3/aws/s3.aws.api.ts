@@ -12,7 +12,8 @@ export class AwsS3API {
     const awsS3UploadParams = {
       Bucket: process.env.TIMELAPSE_S3_BUCKET_NAME,
       Key: [process.env.TIMELAPSE_S3_PATH, file.name].join('/'),
-      Body: file.data
+      Body: file.data,
+      ContentType: file.mimetype
     };
 
     return new Promise((resolve, reject) => {
@@ -20,7 +21,6 @@ export class AwsS3API {
         if (error) {
           reject(error)
         } else {
-          console.log('Fiel storted, ', data);
           resolve(data.Location);
         }
       })
