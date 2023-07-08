@@ -34,4 +34,4 @@ jobs:
       - name: Creating a snapshot of the figma project
         run: |
           TIMELAPSE_S3_PATH=$(echo "${{github.repository}}" | cut -d'/' -f2)
-          npx figma-timelapse@1.0.6 snapshot --file ${{ env.TIMELAPSE_FIGMA_FILE_UUID }} --nodes=0-1 --frequency=360 -o=3600
+          npx figma-timelapse@1.0.6 snapshot --file ${{ env.TIMELAPSE_FIGMA_FILE_UUID }} --nodes=0-1,12-17,13-86 --frequency=360 -o=3600
