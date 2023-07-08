@@ -1,0 +1,37 @@
+name: Figma Timelapse
+
+on:
+  schedule:
+    - cron: '0/5 * * * *'
+  push:
+    branches:
+      - main
+
+env:
+  TIMELAPSE_S3_ACCESS_KEY_ID: ${{ secrets.TIMELAPSE_S3_ACCESS_KEY_ID }}
+  TIMELAPSE_S3_SECRET_ACCESS_KEY: ${{ secrets.TIMELAPSE_S3_SECRET_ACCESS_KEY }}
+  TIMELAPSE_S3_BUCKET_NAME: ${{ vars.TIMELAPSE_S3_BUCKET_NAME }}
+  TIMELAPSE_S3_ENDPOINT: ""
+  TIMELAPSE_S3_REGION: ${{ vars.TIMELAPSE_S3_REGION }}
+
+  # S3 vendor (aws, minio, etc)
+  TIMELAPSE_S3_VENDOR: ${{ vars.TIMELAPSE_S3_VENDOR }}
+
+  # Directory in S3 bucket for scoped assets
+  # Gets the name of the project
+  TIMELAPSE_S3_PATH: ""
+
+  # Figma API key
+  TIMELAPSE_FIGMA_API_KEY: ${{ secrets.TIMELAPSE_FIGMA_API_KEY }}
+  TIMELAPSE_FIGMA_FILE_UUID: ${{ vars.TIMELAPSE_FIGMA_FILE_UUID }}
+
+jobs:
+  snapshot:
+    name: Create snaphot
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Creating a snapshot of the figma project
+        run: |
+          TIMELAPSE_S3_PATH=$(echo "${{github.repository}}" | cut -d'/' -f2)
+          npx figma-timelapse@1.0.6 snapshot --file ${{ env.TIMELAPSE_FIGMA_FILE_UUID }} --nodes=0-1 --frequency=360 -o=3600
